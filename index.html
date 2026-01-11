@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Something For You</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body {
+  margin: 0;
+  background: #0f172a;
+  font-family: 'Segoe UI', sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  color: white;
+  overflow: hidden;
+}
+
+/* Start Screen */
+.start-screen {
+  text-align: center;
+}
+
+.start-screen h1 {
+  font-size: 2rem;
+  margin: 0;
+}
+
+.start-screen h1.subtitle {
+  font-size: 1rem; /* smaller */
+  margin-top: 5px;
+  font-weight: 400;
+  opacity: 0.8;
+}
+
+.start-btn, #dedicateBtn {
+  background: #ec4899;
+  color: white;
+  border: none;
+  padding: 15px 30px;
+  border-radius: 25px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.start-btn:hover, #dedicateBtn:hover { background: #f472b6; }
+
+/* Chat Container */
+.chat-container {
+  width: 100%;
+  max-width: 420px;
+  height: 90vh;
+  background: #020617;
+  border-radius: 20px;
+  display: none;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+  position: relative;
+}
+
+.header {
+  padding: 15px;
+  text-align: center;
+  font-weight: 600;
+  border-bottom: 1px solid #1e293b;
+}
+
+.messages {
+  flex: 1;
+  padding: 15px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.bubble {
+  max-width: 80%;
+  padding: 12px 16px;
+  margin-bottom: 12px;
+  border-radius: 18px;
+  line-height: 1.4;
+  white-space: pre-wrap;
+}
+
+.left { background: #1e293b; align-self: flex-start; border-bottom-left-radius: 5px; }
+.right { background: #ec4899; align-self: flex-end; border-bottom-right-radius: 5px; }
+
+.typing { font-size: 0.9rem; opacity: 0.6; margin-bottom: 12px; }
+
+.footer { padding: 12px; text-align: center; font-size: 0.8rem; opacity: 0.6; }
+
+/* Dedication Screen */
+.dedication {
+  position: absolute;
+  inset: 0;
+  background: #020617;
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 30px;
+  animation: fadeIn 2s ease;
+  overflow: hidden;
+}
+
+.dedication h2 { font-weight: 400; margin-bottom: 20px; }
+.dedication p { font-size: 1.1rem; line-height: 1.6; opacity: 0.9; }
+
+@keyframes fadeIn { from {opacity:0;} to {opacity:1;} }
+
+/* Confetti Hearts */
+.heart {
+  position: absolute;
+  color: #ec4899;
+  font-size: 20px;
+  animation: floatUp 3s linear forwards;
+}
+
+@keyframes floatUp {
+  0% { transform: translateY(0) scale(1); opacity: 1; }
+  100% { transform: translateY(-300px) scale(1.5); opacity: 0; }
+}
+
+/* Music Visualizer Bars */
+.visualizer {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  width: 100%;
+  height: 80px;
+  gap: 4px;
+  position: absolute;
+  bottom: 50px;
+}
+
+.bar {
+  width: 6px;
+  background: #ec4899;
+  height: 10px;
+  animation: pulse 0.5s infinite alternate;
+}
+
+@keyframes pulse {
+  0% { height: 10px; }
+  100% { height: 50px; }
+}
+
+#dedicateBtn {
+  margin-top: 20px;
+}
+</style>
+</head>
+
+<body>
+
+<!-- Start Screen -->
+<div class="start-screen" id="startScreen">
+  <h1>💗 Something For You</h1>
+  <h1 class="subtitle">Made with love by spiderman</h1>
+  <p>Tap the button to start your surprise ❤️</p>
+  <button class="start-btn" id="startBtn">Start</button>
+</div>
+
+<!-- Chat Container -->
+<div class="chat-container" id="chatContainer">
+  <div class="header">💗 Something For You</div>
+  <div class="messages" id="messages"></div>
+  <div class="footer">Made with love by spiderman</div>
+
+  <!-- Dedication Screen -->
+  <div class="dedication" id="dedication">
+    <h2>This song is for you 🎶</h2>
+    <p>
+      Every word reminds me of you.<br><br>
+      When you hear this,<br>
+      know that somewhere,<br>
+      my heart chose you again.
+    </p>
+    <div class="visualizer" id="visualizer"></div>
+  </div>
+</div>
+
+<!-- Background Music -->
+<audio id="bg-music" preload="auto">
+  <source src="bgmusic.mp3" type="audio/mpeg">
+</audio>
+
+<!-- Dedicated Song -->
+<audio id="song" preload="auto">
+  <source src="song.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+// Chat Messages
+const messages = [
+  { text: "Hey…", side: "left" },
+  { text: "I’ve been waiting for this moment.", side: "left" },
+  { text: "Do you know why today feels special?", side: "left" },
+  { text: "Because today, you were born.", side: "right" },
+  { text: "loveii, you are someone rare.", side: "left" },
+  { text: "Your kindness, your smile, the way you exist… it matters.", side: "left" },
+  { text: "You make ordinary days feel lighter.", side: "left" },
+  { text: "And my life feels better because you’re in it.", side: "left" },
+  { text: "So today, I just want to say this.", side: "right" },
+  { text: "Happy Birthday ❤️", side: "right" },
+  { text: "I hope this year gives you everything you deserve.", side: "left" }
+];
+
+const chat = document.getElementById("messages");
+const chatContainer = document.getElementById("chatContainer");
+const startScreen = document.getElementById("startScreen");
+const startBtn = document.getElementById("startBtn");
+const bgMusic = document.getElementById("bg-music");
+const song = document.getElementById("song");
+const dedication = document.getElementById("dedication");
+const visualizer = document.getElementById("visualizer");
+
+let index = 0;
+
+// Typing Dots
+function showTypingDots(callback){
+  const dots = document.createElement("div");
+  dots.className="typing";
+  dots.textContent="typing…";
+  chat.appendChild(dots);
+  chat.scrollTop = chat.scrollHeight;
+  setTimeout(()=>{ dots.remove(); callback(); },1200);
+}
+
+// Type Message
+function typeMessage(text, bubble, callback){
+  let i=0;
+  function type(){
+    if(i<text.length){
+      bubble.textContent+=text[i++];
+      chat.scrollTop = chat.scrollHeight;
+      setTimeout(type,40);
+    } else callback();
+  }
+  type();
+}
+
+// Next Message
+function nextMessage(){
+  if(index>=messages.length){
+    showDedicateButton();
+    return;
+  }
+  showTypingDots(()=>{
+    const msg=messages[index];
+    const bubble=document.createElement("div");
+    bubble.className=`bubble ${msg.side}`;
+    chat.appendChild(bubble);
+    typeMessage(msg.text,bubble,()=>{
+      index++;
+      setTimeout(nextMessage,800);
+    });
+  });
+}
+
+// Fade Out BG Music
+function fadeOutBgMusic(callback){
+  let vol=bgMusic.volume;
+  const fade=setInterval(()=>{
+    if(vol>0.05){
+      vol-=0.05;
+      bgMusic.volume=vol;
+    } else {
+      bgMusic.pause();
+      bgMusic.volume=1;
+      clearInterval(fade);
+      callback();
+    }
+  },100);
+}
+
+// Create Hearts
+function createHearts(count){
+  for(let i=0;i<count;i++){
+    const heart=document.createElement("div");
+    heart.className="heart";
+    heart.style.left=Math.random()*90+"%";
+    heart.style.fontSize=10+Math.random()*20+"px";
+    heart.style.animationDuration=2+Math.random()*2+"s";
+    heart.textContent="❤️";
+    dedication.appendChild(heart);
+    setTimeout(()=>heart.remove(),4000);
+  }
+}
+
+// Music Visualizer
+function createVisualizer(bars){
+  for(let i=0;i<bars;i++){
+    const bar=document.createElement("div");
+    bar.className="bar";
+    bar.style.animationDuration=0.3+Math.random()*0.7+"s";
+    visualizer.appendChild(bar);
+  }
+}
+
+// Show Dedicate Button
+function showDedicateButton(){
+  const btn = document.createElement("button");
+  btn.id="dedicateBtn";
+  btn.textContent="🎵 This song is for you";
+  chat.appendChild(btn);
+  chat.scrollTop = chat.scrollHeight;
+
+  btn.addEventListener("click", ()=>{
+    fadeOutBgMusic(()=>{
+      dedication.style.display="flex";
+      song.play().catch(()=>{});
+      createHearts(30);
+      createVisualizer(20);
+      btn.style.display="none";
+    });
+  });
+}
+
+// Start Button
+startBtn.addEventListener("click",()=>{
+  startScreen.style.display="none";
+  chatContainer.style.display="flex";
+
+  // Mobile autoplay fix: only play music on tap
+  bgMusic.currentTime=9;
+  bgMusic.volume=1;
+  bgMusic.play().catch(()=>{});
+
+  song.load(); // preload dedicated song
+
+  nextMessage();
+});
+</script>
+</body>
+</html>
